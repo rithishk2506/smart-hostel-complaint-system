@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Warden Dashboard | Smart Hostel Complaint System</title>
+
+
+
+    <style>
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #f1f5f9;
+
+            color: #172b4d;
+
+        }
+
+
+
+        header {
+
+            background: #123b63;
+
+            color: white;
+
+            padding: 24px 4%;
+
+        }
+
+
+
+        header h1 {
+
+            margin: 0 0 8px;
+
+            font-size: 26px;
+
+        }
+
+
+
+        header p {
+
+            margin: 0;
+
+            color: #dbeafe;
+
+        }
+
+
+
+        main {
+
+            max-width: 1450px;
+
+            margin: 28px auto;
+
+            padding: 0 20px;
+
+        }
+
+
+
+        .summary {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, minmax(180px, 1fr));
+
+            gap: 16px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .summary-card,
+
+        .panel {
+
+            background: white;
+
+            border-radius: 10px;
+
+            box-shadow: 0 2px 8px #0000000a;
+
+        }
+
+
+
+        .summary-card {
+
+            padding: 20px;
+
+        }
+
+
+
+        .summary-card span {
+
+            color: #64748b;
+
+            font-size: 14px;
+
+        }
+
+
+
+        .summary-card h2 {
+
+            margin: 10px 0 0;
+
+            font-size: 30px;
+
+        }
+
+
+
+        .panel {
+
+            padding: 24px;
+
+        }
+
+
+
+        .panel-heading {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            flex-wrap: wrap;
+
+            gap: 12px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+
+        .panel-heading h2 {
+
+            margin: 0;
+
+            font-size: 21px;
+
+        }
+
+
+
+        .connection-area {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            font-size: 12px;
+
+            color: #475569;
+
+        }
+
+
+
+        .connection {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+        }
+
+
+
+        .connection-dot {
+
+            width: 8px;
+
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #94a3b8;
+
+        }
+
+
+
+        .connection.connected .connection-dot {
+
+            background: #16a34a;
+
+        }
+
+
+
+        .connection.disconnected .connection-dot {
+
+            background: #dc2626;
+
+        }
+
+
+
+        button {
+
+            border: none;
+
+            background: #123b63;
+
+            color: white;
+
+            padding: 10px 15px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+        }
+
+
+
+        button:hover {
+
+            background: #1d4f80;
+
+        }
+
+
+
+        button:disabled {
+
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+        }
+
+
+
+        .filters {
+
+            display: grid;
+
+            grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(160px, 1fr)) auto;
+
+            gap: 12px;
+
+            align-items: end;
+
+            margin: 20px 0 14px;
+
+            padding: 16px;
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 8px;
+
+        }
+
+
+
+        .filter-field {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+
+        }
+
+
+
+        .filter-field label {
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            color: #475569;
+
+        }
+
+
+
+        input,
+
+        select {
+
+            width: 100%;
+
+            min-height: 38px;
+
+            padding: 9px 10px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 6px;
+
+            background: white;
+
+            color: #172b4d;
+
+            font: inherit;
+
+            font-size: 13px;
+
+        }
+
+
+
+        input:focus,
+
+        select:focus {
+
+            outline: 2px solid #93c5fd;
+
+            border-color: #2563eb;
+
+        }
+
+
+
+        .message {
+
+            margin: 12px 0;
+
+            color: #475569;
+
+            font-size: 13px;
+
+        }
+
+
+
+        .table-wrap {
+
+            overflow-x: auto;
+
+        }
+
+
+
+        table {
+
+            border-collapse: collapse;
+
+            width: 100%;
+
+            min-width: 1120px;
+
+        }
+
+
+
+        th,
+
+        td {
+
+            padding: 12px 10px;
+
+            border-bottom: 1px solid #e2e8f0;
+
+            text-align: left;
+
+            font-size: 12px;
+
+            vertical-align: top;
+
+        }
+
+
+
+        th {
+
+            background: #f8fafc;
+
+            color: #475569;
+
+            font-size: 12px;
+
+        }
+
+
+
+        tbody tr:hover {
+
+            background: #f8fafc;
+
+        }
+
+
+
+        .severity,
+
+        .status {
+
+            display: inline-block;
+
+            border-radius: 20px;
+
+            padding: 5px 8px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+        }
+
+
+
+        .CRITICAL {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+
+        }
+
+
+
+        .HIGH {
+
+            background: #ffedd5;
+
+            color: #9a3412;
+
+        }
+
+
+
+        .MEDIUM {
+
+            background: #fef3c7;
+
+            color: #92400e;
+
+        }
+
+
+
+        .LOW {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+
+        .OPEN {
+
+            background: #dbeafe;
+
+            color: #1d4ed8;
+
+        }
+
+
+
+        .ACKNOWLEDGED {
+
+            background: #fef3c7;
+
+            color: #92400e;
+
+        }
+
+
+
+        .HANDLED {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+
+        .reason {
+
+            min-width: 170px;
+
+            max-width: 280px;
+
+            overflow-wrap: anywhere;
+
+        }
+
+
+
+        .complaint-title {
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+
+        }
+
+
+
+        .complaint-id {
+
+            color: #64748b;
+
+        }
+
+
+
+        .action-cell {
+
+            min-width: 130px;
+
+        }
+
+
+
+        .action-cell select {
+
+            margin-bottom: 6px;
+
+        }
+
+
+
+        .reassign-button {
+            margin-top: 7px;
+            width: 100%;
+            background: #b91c1c;
+            white-space: nowrap;
+        }
+
+        .reassign-button:hover {
+            background: #991b1b;
+        }
+
+        .action-cell button {
+            width: 100%;
+        }
+
+        .empty {
+
+            padding: 28px;
+
+            text-align: center;
+
+            color: #64748b;
+
+        }
+
+
+
+        footer {
+
+            text-align: center;
+
+            padding: 24px;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+        }
+
+
+
+        .view-tabs {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 18px;
+
+        }
+
+
+
+        .view-tab {
+
+            background: #e2e8f0;
+
+            color: #123b63;
+
+            border: 1px solid #cbd5e1;
+
+            padding: 12px 18px;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .view-tab.active {
+
+            background: #123b63;
+
+            color: white;
+
+            border-color: #123b63;
+
+        }
+
+
+
+        .view-panel[hidden] {
+
+            display: none !important;
+
+        }
+
+
+
+        .view-panel {
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .complaint-table {
+
+            min-width: 850px;
+
+        }
+
+
+
+        .small-muted {
+
+            color: #64748b;
+
+            margin: 0 0 14px;
+
+            font-size: 13px;
+
+        }
+
+
+
+        @media (max-width: 850px) {
+
+            .summary {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+
+            .filters {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+
+            .panel {
+
+                padding: 15px;
+
+            }
+
+        }
+
+
+
+        /* Real-time SLA notification toasts */
+        .notification-stack {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 9999;
+            width: min(420px, calc(100vw - 36px));
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .notification-toast {
+            background: #ffffff;
+            color: #172b4d;
+            border: 1px solid #fecaca;
+            border-left: 5px solid #dc2626;
+            border-radius: 9px;
+            padding: 15px 16px;
+            box-shadow: 0 8px 24px #00000020;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            pointer-events: auto;
+            animation: notificationSlideIn 0.25s ease-out;
+        }
+
+        .notification-toast .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-toast .toast-heading {
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #991b1b;
+            font-size: 14px;
+        }
+
+        .notification-toast .toast-message {
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .notification-toast .toast-close {
+            background: transparent;
+            color: #64748b;
+            padding: 2px 6px;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .notification-toast .toast-close:hover {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @keyframes notificationSlideIn {
+            from { opacity: 0; transform: translateX(15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 500px) {
+            .notification-stack {
+                top: 10px;
+                right: 10px;
+                width: calc(100vw - 20px);
+            }
+        }
+
+    
+
+        /* Persistent database-backed notifications */
+        .persistent-panel {
+            margin: 18px 0 22px;
+        }
+
+        .persistent-panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .persistent-panel-header h2 {
+            margin: 0 0 6px;
+            color: #123b63;
+            font-size: 21px;
+        }
+
+        .persistent-panel-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .saved-notification-count {
+            display: inline-block;
+            margin-left: 8px;
+            border-radius: 20px;
+            padding: 4px 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .saved-notification-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .saved-notification-item {
+            min-width: 0;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #94a3b8;
+            border-radius: 8px;
+            padding: 14px;
+            background: #f8fafc;
+            overflow-wrap: anywhere;
+        }
+
+        .saved-notification-item.unread {
+            border-left-color: #dc2626;
+            background: #fffafa;
+        }
+
+        .saved-notification-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .saved-notification-title-row h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+        }
+
+        .notification-read-badge {
+            flex: 0 0 auto;
+            border-radius: 20px;
+            padding: 4px 7px;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .notification-read-badge.unread-badge {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .saved-notification-message {
+            margin: 5px 0 10px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .saved-notification-meta {
+            margin: 5px 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .mark-notification-read {
+            margin-top: 8px;
+            padding: 8px 11px;
+            background: #123b63;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .saved-notification-empty {
+            grid-column: 1 / -1;
+            padding: 18px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 850px) {
+            .saved-notification-list { grid-template-columns: 1fr; }
+        }
+
+    </style>
+    <script src="/js/csrf.js"></script>
+    <link rel="stylesheet" href="/css/professional-ui.css?v=2">
+    <script src="/js/portal-shell.js" defer></script>
+    <link rel="stylesheet" href="/css/footer.css">
+
+</head>
+
+
+
+<body>
+
+<header>
+
+    <h1>Warden Dashboard</h1>
+
+    <p>Smart Hostel Complaint Management and Real-Time Resolution System</p>
+
+</header>
+
+<div id="notificationStack" class="notification-stack" aria-live="polite" aria-atomic="false"></div>
+
+<main>
+
+    <nav class="view-tabs" aria-label="Complaint views">
+
+        <button type="button" class="view-tab active" data-view="recent">Recent Complaints</button>
+
+        <button type="button" class="view-tab" data-view="history">Complaints History</button>
+
+        <button type="button" class="view-tab" data-view="overdue">Overdue Complaints</button>
+
+    </nav>
+
+    <section class="panel persistent-panel" aria-labelledby="savedWardenNotificationsHeading">
+        <div class="persistent-panel-header">
+            <div>
+                <h2 id="savedWardenNotificationsHeading">
+                    Saved Notifications
+                    <span id="wardenUnreadCount" class="saved-notification-count">0 unread</span>
+                </h2>
+                <p>Saved SLA alerts remain available after a browser refresh or application restart.</p>
+            </div>
+            <button type="button" id="refreshWardenNotificationsButton">Refresh Notifications</button>
+        </div>
+        <p id="wardenNotificationMessage" class="message" role="status" aria-live="polite">
+            Loading saved notifications...
+        </p>
+        <div id="wardenNotificationList" class="saved-notification-list">
+            <div class="saved-notification-empty">Loading saved notifications...</div>
+        </div>
+    </section>
+
+
+    <section id="recentPanel" class="panel view-panel">
+
+        <div class="panel-heading">
+
+            <h2>Recent Complaints</h2>
+
+            <div class="connection-area">
+
+                <span id="complaintCount">Loading complaints...</span>
+
+                <button type="button" id="refreshComplaintsButton">Refresh</button>
+
+            </div>
+
+        </div>
+
+        <p class="small-muted">Submitted complaints that have not yet been resolved, verified, or closed.</p>
+
+        <div class="table-wrap">
+
+            <table class="complaint-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Complaint ID</th>
+
+                        <th>Title</th>
+
+                        <th>Category</th>
+
+                        <th>Severity</th>
+
+                        <th>Priority</th>
+
+                        <th>Status</th>
+
+                        <th>Submitted At</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="recentComplaintsTable">
+
+                    <tr><td colspan="7" class="empty">Loading complaints...</td></tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
+    <section id="historyPanel" class="panel view-panel" hidden>
+
+        <div class="panel-heading">
+
+            <h2>Complaints History</h2>
+
+            <span id="historyCount">Loading history...</span>
+
+        </div>
+
+        <p class="small-muted">Complaints with status RESOLVED, VERIFIED, or CLOSED.</p>
+
+        <div class="table-wrap">
+
+            <table class="complaint-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Complaint ID</th>
+
+                        <th>Title</th>
+
+                        <th>Category</th>
+
+                        <th>Severity</th>
+
+                        <th>Priority</th>
+
+                        <th>Final Status</th>
+
+                        <th>Submitted At</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyComplaintsTable">
+
+                    <tr><td colspan="7" class="empty">Loading history...</td></tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="summary" id="escalationSummary">
+
+        <div class="summary-card">
+
+            <span>Matching Escalations</span>
+
+            <h2 id="totalCount">0</h2>
+
+        </div>
+
+
+
+        <div class="summary-card">
+
+            <span>Open Escalations</span>
+
+            <h2 id="openCount">0</h2>
+
+        </div>
+
+
+
+        <div class="summary-card">
+
+            <span>Critical Escalations</span>
+
+            <h2 id="criticalCount">0</h2>
+
+        </div>
+
+    </section>
+
+
+
+    <section id="overduePanel" class="panel view-panel" hidden>
+
+        <div class="panel-heading">
+
+            <h2>SLA Escalations</h2>
+
+
+
+            <div class="connection-area">
+
+                <span id="connectionStatus" class="connection disconnected">
+
+                    <span class="connection-dot"></span>
+
+                    <span id="connectionText">Connecting to live updates...</span>
+
+                </span>
+
+
+
+                <button type="button" id="refreshButton">
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="filters">
+
+            <div class="filter-field">
+
+                <label for="searchInput">Search complaint</label>
+
+                <input
+
+                    type="search"
+
+                    id="searchInput"
+
+                    placeholder="Enter complaint title or ID">
+
+            </div>
+
+
+
+            <div class="filter-field">
+
+                <label for="statusFilter">Escalation status</label>
+
+                <select id="statusFilter">
+
+                    <option value="ALL">All statuses</option>
+
+                    <option value="OPEN">Open</option>
+
+                    <option value="ACKNOWLEDGED">Acknowledged</option>
+
+                    <option value="HANDLED">Handled</option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="filter-field">
+
+                <label for="severityFilter">Severity</label>
+
+                <select id="severityFilter">
+
+                    <option value="ALL">All severities</option>
+
+                    <option value="CRITICAL">Critical</option>
+
+                    <option value="HIGH">High</option>
+
+                    <option value="MEDIUM">Medium</option>
+
+                    <option value="LOW">Low</option>
+
+                </select>
+
+            </div>
+
+
+
+            <button type="button" id="clearFiltersButton">
+
+                Clear Filters
+
+            </button>
+
+        </div>
+
+
+
+        <p id="message" class="message">Loading escalation records...</p>
+
+
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Escalation ID</th>
+
+                    <th>Complaint</th>
+
+                    <th>Severity</th>
+
+                    <th>Complaint Status</th>
+
+                    <th>SLA Deadline</th>
+
+                    <th>Escalated At</th>
+
+                    <th>Escalation Status</th>
+
+                    <th>Reason</th>
+
+                    <th>Warden Action</th>
+
+                </tr>
+
+                </thead>
+
+
+
+                <tbody id="escalationTable">
+
+                <tr>
+
+                    <td colspan="9" class="empty">Loading records...</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+
+<footer>
+
+    Smart Hostel Complaint System | Warden Administration
+
+</footer>
+
+
+
+<!-- STOMP client for WebSocket live updates -->
+
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
+
+
+
+<script>
+
+    "use strict";
+
+
+
+    const API_URL = "/api/escalations";
+
+    const COMPLAINTS_API_URL = "/api/complaints";
+
+    const TOPIC_URL = "/topic/complaints";
+    const NOTIFICATIONS_API_URL = "/api/notifications";
+
+
+
+    let allEscalations = [];
+
+    let allComplaints = [];
+
+    let stompClient = null;
+
+    let loading = false;
+
+    let complaintsLoading = false;
+
+    let complaintsRefreshQueued = false;
+
+    let escalationsRefreshQueued = false;
+
+    let currentView = "recent";
+
+    // Keep duplicate live escalation events from generating duplicate toasts
+    // during this dashboard session.
+    const notifiedEscalationIds = new Set();
+    let wardenNotifications = [];
+    let wardenNotificationsLoading = false;
+
+    function wardenNotificationIsRead(notification) {
+        return Boolean(notification && (notification.read === true || notification.isRead === true));
+    }
+
+    function formatWardenNotificationDate(value) {
+        if (!value) return "Date not available";
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    function renderWardenNotifications() {
+        const list = document.getElementById("wardenNotificationList");
+        const message = document.getElementById("wardenNotificationMessage");
+        const unreadCount = wardenNotifications.filter(n => !wardenNotificationIsRead(n)).length;
+        document.getElementById("wardenUnreadCount").textContent = unreadCount + " unread";
+        list.replaceChildren();
+
+        if (wardenNotifications.length === 0) {
+            list.appendChild(document.createElement("div"));
+            list.firstElementChild.className = "saved-notification-empty";
+            list.firstElementChild.textContent =
+                "No saved notifications yet. New SLA breach alerts will appear here.";
+            message.textContent = "No saved warden notifications found.";
+            return;
+        }
+
+        message.textContent = "Showing " + wardenNotifications.length +
+            " saved notification(s), newest first.";
+
+        wardenNotifications.forEach(notification => {
+            const read = wardenNotificationIsRead(notification);
+            const card = document.createElement("article");
+            card.className = "saved-notification-item" + (read ? "" : " unread");
+
+            const titleRow = document.createElement("div");
+            titleRow.className = "saved-notification-title-row";
+
+            const title = document.createElement("h3");
+            title.textContent = notification.title || "Notification";
+            titleRow.appendChild(title);
+
+            const badge = document.createElement("span");
+            badge.className = "notification-read-badge" + (read ? "" : " unread-badge");
+            badge.textContent = read ? "Read" : "Unread";
+            titleRow.appendChild(badge);
+            card.appendChild(titleRow);
+
+            const body = document.createElement("p");
+            body.className = "saved-notification-message";
+            body.textContent = notification.message || "No message provided.";
+            card.appendChild(body);
+
+            const details = [];
+            if (notification.complaintId != null) details.push("Complaint #" + notification.complaintId);
+            if (notification.assignmentId != null) details.push("Assignment #" + notification.assignmentId);
+            if (notification.eventType) details.push(String(notification.eventType).replaceAll("_", " "));
+            if (details.length) {
+                const meta = document.createElement("p");
+                meta.className = "saved-notification-meta";
+                meta.textContent = details.join(" · ");
+                card.appendChild(meta);
+            }
+
+            const created = document.createElement("p");
+            created.className = "saved-notification-meta";
+            created.textContent = "Received: " + formatWardenNotificationDate(notification.createdAt);
+            card.appendChild(created);
+
+            if (!read) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "mark-notification-read";
+                button.textContent = "Mark as read";
+                button.dataset.notificationId = String(notification.notificationId);
+                button.addEventListener("click", () => markWardenNotificationRead(notification.notificationId, button));
+                card.appendChild(button);
+            }
+
+            list.appendChild(card);
+        });
+    }
+
+    async function loadWardenNotifications() {
+        if (wardenNotificationsLoading) return;
+        wardenNotificationsLoading = true;
+        const message = document.getElementById("wardenNotificationMessage");
+
+        try {
+            const response = await fetch(NOTIFICATIONS_API_URL + "/warden", {
+                headers: { "Accept": "application/json" },
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                const details = await response.text();
+                throw new Error("HTTP " + response.status + (details ? ": " + details : ""));
+            }
+
+            const result = await response.json();
+            if (!Array.isArray(result)) {
+                throw new Error("Expected a JSON array from the warden notifications API.");
+            }
+
+            wardenNotifications = result;
+            message.style.color = "";
+            renderWardenNotifications();
+        } catch (error) {
+            message.textContent = "Could not load saved notifications: " + error.message;
+            message.style.color = "#b91c1c";
+        } finally {
+            wardenNotificationsLoading = false;
+        }
+    }
+
+    async function markWardenNotificationRead(notificationId, button) {
+        button.disabled = true;
+        button.textContent = "Saving...";
+
+        try {
+            const url = NOTIFICATIONS_API_URL + "/" + encodeURIComponent(notificationId) +
+                "/read?recipientType=WARDEN";
+            const response = await fetch(url, {
+                method: "PATCH",
+                headers: { "Accept": "application/json" }
+            });
+
+            if (!response.ok) {
+                const details = await response.text();
+                throw new Error("HTTP " + response.status + (details ? ": " + details : ""));
+            }
+
+            await loadWardenNotifications();
+        } catch (error) {
+            button.disabled = false;
+            button.textContent = "Mark as read";
+            const message = document.getElementById("wardenNotificationMessage");
+            message.textContent = "Could not mark notification as read: " + error.message;
+            message.style.color = "#b91c1c";
+        }
+    }
+
+    function showNotification(title, text) {
+        const stack = document.getElementById("notificationStack");
+        if (!stack) return;
+
+        const toast = document.createElement("div");
+        toast.className = "notification-toast";
+        toast.setAttribute("role", "status");
+
+        const content = document.createElement("div");
+        content.className = "toast-content";
+
+        const heading = document.createElement("div");
+        heading.className = "toast-heading";
+        heading.textContent = title;
+
+        const body = document.createElement("div");
+        body.className = "toast-message";
+        body.textContent = text;
+
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.className = "toast-close";
+        closeButton.setAttribute("aria-label", "Dismiss notification");
+        closeButton.textContent = "\u00D7";
+        closeButton.addEventListener("click", function () {
+            toast.remove();
+        });
+
+        content.appendChild(heading);
+        content.appendChild(body);
+        toast.appendChild(content);
+        toast.appendChild(closeButton);
+        stack.prepend(toast);
+
+        // Remove the toast automatically after 12 seconds.
+        window.setTimeout(function () {
+            toast.remove();
+        }, 12000);
+    }
+
+    function handleLiveEvent(event) {
+        if (!event || typeof event !== "object") return;
+
+        const eventType = String(event.eventType || "");
+
+        if (eventType === "SLA_ESCALATED") {
+            const notificationKey = String(
+                event.escalationId ??
+                (String(event.complaintId) + ":" + String(event.escalatedAt || ""))
+            );
+
+            if (notifiedEscalationIds.has(notificationKey)) return;
+            notifiedEscalationIds.add(notificationKey);
+
+            showNotification(
+                "SLA BREACH — ACTION REQUIRED",
+                event.message || (
+                    "Complaint #" + event.complaintId +
+                    " has exceeded its SLA and requires warden attention."
+                )
+            );
+            loadWardenNotifications();
+        } else if (eventType === "SLA_ESCALATION_STATUS_UPDATED") {
+            showNotification(
+                "Escalation status updated",
+                event.message || (
+                    "Escalation #" + event.escalationId +
+                    " is now " + event.escalationStatus + "."
+                )
+            );
+            loadWardenNotifications();
+        }
+    }
+
+
+
+
+    const table = document.getElementById("escalationTable");
+
+    const message = document.getElementById("message");
+
+    const connectionStatus = document.getElementById("connectionStatus");
+
+    const connectionText = document.getElementById("connectionText");
+
+
+
+    const searchInput = document.getElementById("searchInput");
+
+    const statusFilter = document.getElementById("statusFilter");
+
+    const severityFilter = document.getElementById("severityFilter");
+
+
+
+    function escapeHtml(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+
+            const entities = {
+
+                "&": "&amp;",
+
+                "<": "&lt;",
+
+                ">": "&gt;",
+
+                '"': "&quot;",
+
+                "'": "&#39;"
+
+            };
+
+
+
+            return entities[char];
+
+        });
+
+    }
+
+
+
+    function formatDate(value) {
+
+        if (!value) {
+
+            return "Not available";
+
+        }
+
+
+
+        const date = new Date(value);
+
+
+
+        if (Number.isNaN(date.getTime())) {
+
+            return String(value);
+
+        }
+
+
+
+        return date.toLocaleString();
+
+    }
+
+
+
+    function setConnectionStatus(connected, text) {
+
+        connectionStatus.classList.toggle("connected", connected);
+
+        connectionStatus.classList.toggle("disconnected", !connected);
+
+        connectionText.textContent = text;
+
+    }
+
+
+
+    function complaintStatus(item) {
+
+        return String(item.status || "").trim().toUpperCase();
+
+    }
+
+
+
+    function isCompletedComplaint(item) {
+
+        return ["RESOLVED", "VERIFIED", "CLOSED"].includes(complaintStatus(item));
+
+    }
+
+
+
+    function renderComplaintRows(items, targetId, emptyText) {
+
+        const target = document.getElementById(targetId);
+
+        if (!items.length) {
+
+            target.innerHTML = `<tr><td colspan="7" class="empty">${escapeHtml(emptyText)}</td></tr>`;
+
+            return;
+
+        }
+
+
+
+        target.innerHTML = items.map(function (item) {
+
+            const severity = String(item.severity || "LOW").trim().toUpperCase();
+
+            const safeSeverity = ["CRITICAL", "HIGH", "MEDIUM", "LOW"].includes(severity) ? severity : "LOW";
+
+            return `
+
+                <tr>
+
+                    <td>#${escapeHtml(item.complaintId)}</td>
+
+                    <td>
+
+                        <div class="complaint-title">${escapeHtml(item.title || "Untitled complaint")}</div>
+
+                        <div class="complaint-id">${escapeHtml(item.description || "")}</div>
+
+                    </td>
+
+                    <td>${escapeHtml(item.category || "Not specified")}</td>
+
+                    <td><span class="severity ${safeSeverity}">${escapeHtml(severity)}</span></td>
+
+                    <td>${escapeHtml(item.priority || "MEDIUM")}</td>
+
+                    <td>${escapeHtml(complaintStatus(item) || "UNKNOWN")}</td>
+
+                    <td>${escapeHtml(formatDate(item.createdAt))}</td>
+
+                </tr>`;
+
+        }).join("");
+
+    }
+
+
+
+    function renderComplaints() {
+
+        const recent = allComplaints.filter(item => !isCompletedComplaint(item))
+
+            .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+        const history = allComplaints.filter(isCompletedComplaint)
+
+            .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+
+
+        renderComplaintRows(recent, "recentComplaintsTable", "No unresolved complaints right now.");
+
+        renderComplaintRows(history, "historyComplaintsTable", "No resolved complaints in history yet.");
+
+        document.getElementById("complaintCount").textContent = recent.length + " unresolved complaint(s)";
+
+        document.getElementById("historyCount").textContent = history.length + " completed complaint(s)";
+
+    }
+
+
+
+    async function loadComplaints() {
+
+        if (complaintsLoading) {
+
+            // If an event arrives during a fetch, run one more fetch afterward.
+
+            complaintsRefreshQueued = true;
+
+            return;
+
+        }
+
+        complaintsLoading = true;
+
+        const refreshButton = document.getElementById("refreshComplaintsButton");
+
+        if (refreshButton) refreshButton.disabled = true;
+
+
+
+        try {
+
+            const response = await fetch(COMPLAINTS_API_URL, {
+
+                headers: { "Accept": "application/json" },
+
+                cache: "no-store"
+
+            });
+
+            if (!response.ok) {
+
+                if (response.status === 401 || response.status === 403) {
+
+                    throw new Error("Access denied. Check your Spring Security configuration.");
+
+                }
+
+                throw new Error("Server returned HTTP " + response.status);
+
+            }
+
+
+
+            const data = await response.json();
+
+            if (!Array.isArray(data)) {
+
+                throw new Error("Expected a JSON array from /api/complaints.");
+
+            }
+
+
+
+            allComplaints = data;
+
+            renderComplaints();
+
+        } catch (error) {
+
+            document.getElementById("complaintCount").textContent = "Could not load complaints";
+
+            document.getElementById("recentComplaintsTable").innerHTML =
+
+                `<tr><td colspan="7" class="empty">Unable to load complaints: ${escapeHtml(error.message)}</td></tr>`;
+
+            document.getElementById("historyComplaintsTable").innerHTML =
+
+                `<tr><td colspan="7" class="empty">Unable to load complaint history.</td></tr>`;
+
+        } finally {
+
+            complaintsLoading = false;
+
+            if (refreshButton) refreshButton.disabled = false;
+
+            if (complaintsRefreshQueued) {
+
+                complaintsRefreshQueued = false;
+
+                queueMicrotask(loadComplaints);
+
+            }
+
+        }
+
+    }
+
+
+
+    function switchView(view) {
+
+        currentView = view;
+
+        document.getElementById("recentPanel").hidden = view !== "recent";
+
+        document.getElementById("historyPanel").hidden = view !== "history";
+
+        document.getElementById("overduePanel").hidden = view !== "overdue";
+
+        document.getElementById("escalationSummary").hidden = view !== "overdue";
+
+
+
+        document.querySelectorAll(".view-tab").forEach(function (button) {
+
+            const active = button.dataset.view === view;
+
+            button.classList.toggle("active", active);
+
+            button.setAttribute("aria-pressed", String(active));
+
+        });
+
+
+
+        if (view === "overdue") loadEscalations();
+
+        else loadComplaints();
+
+    }
+
+
+
+    function getFilteredEscalations() {
+
+        const search = searchInput.value.trim().toLowerCase();
+
+        const selectedStatus = statusFilter.value;
+
+        const selectedSeverity = severityFilter.value;
+
+
+
+        return allEscalations.filter(function (item) {
+
+            // This view is specifically for currently unresolved, overdue complaints.
+
+            const currentComplaintStatus = String(item.complaintStatus || "").trim().toUpperCase();
+
+            const completed = ["RESOLVED", "VERIFIED", "CLOSED"].includes(currentComplaintStatus);
+
+            const deadline = item.slaDeadline ? new Date(item.slaDeadline).getTime() : NaN;
+
+            const isOverdue = Number.isFinite(deadline) && deadline < Date.now();
+
+            if (completed || !isOverdue) return false;
+
+
+
+            const title = String(item.complaintTitle || "").toLowerCase();
+
+            const complaintId = String(item.complaintId ?? "").toLowerCase();
+
+            const escalationId = String(item.escalationId ?? "").toLowerCase();
+
+
+
+            const status = String(item.status || "").toUpperCase();
+
+            const severity = String(item.severity || "").toUpperCase();
+
+
+
+            const matchesSearch =
+
+                !search ||
+
+                title.includes(search) ||
+
+                complaintId.includes(search) ||
+
+                escalationId.includes(search);
+
+
+
+            const matchesStatus =
+
+                selectedStatus === "ALL" || status === selectedStatus;
+
+
+
+            const matchesSeverity =
+
+                selectedSeverity === "ALL" || severity === selectedSeverity;
+
+
+
+            return matchesSearch && matchesStatus && matchesSeverity;
+
+        });
+
+    }
+
+
+
+    function updateSummary(filtered) {
+
+        document.getElementById("totalCount").textContent = filtered.length;
+
+
+
+        document.getElementById("openCount").textContent =
+
+            filtered.filter(function (item) {
+
+                return String(item.status || "").toUpperCase() === "OPEN";
+
+            }).length;
+
+
+
+        document.getElementById("criticalCount").textContent =
+
+            filtered.filter(function (item) {
+
+                return String(item.severity || "").toUpperCase() === "CRITICAL";
+
+            }).length;
+
+    }
+
+
+
+    function renderEscalations() {
+
+        const filtered = getFilteredEscalations();
+
+
+
+        updateSummary(filtered);
+
+
+
+        if (filtered.length === 0) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="9" class="empty">
+
+                        No escalations match your search and filters.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+
+            message.textContent =
+
+                "Showing 0 of " + allEscalations.length + " escalation record(s).";
+
+            return;
+
+        }
+
+
+
+        table.innerHTML = filtered.map(function (item) {
+
+            const severity = String(item.severity || "LOW").toUpperCase();
+
+            const status = String(item.status || "OPEN").toUpperCase();
+
+
+
+            const allowedStatuses = ["OPEN", "ACKNOWLEDGED", "HANDLED"];
+
+            const safeStatus = allowedStatuses.includes(status) ? status : "OPEN";
+
+
+
+            return `
+
+                <tr>
+
+                    <td>${escapeHtml(item.escalationId)}</td>
+
+
+
+                    <td>
+
+                        <div class="complaint-title">
+
+                            ${escapeHtml(item.complaintTitle || "Untitled complaint")}
+
+                        </div>
+
+                        <div class="complaint-id">
+
+                            Complaint #${escapeHtml(item.complaintId)}
+
+                        </div>
+
+                    </td>
+
+
+
+                    <td>
+
+                        <span class="severity ${escapeHtml(severity)}">
+
+                            ${escapeHtml(severity)}
+
+                        </span>
+
+                    </td>
+
+
+
+                    <td>${escapeHtml(item.complaintStatus || "UNKNOWN")}</td>
+
+                    <td>${escapeHtml(formatDate(item.slaDeadline))}</td>
+
+                    <td>${escapeHtml(formatDate(item.escalatedAt))}</td>
+
+
+
+                    <td>
+
+                        <span class="status ${escapeHtml(safeStatus)}">
+
+                            ${escapeHtml(safeStatus)}
+
+                        </span>
+
+                    </td>
+
+
+
+                    <td class="reason">${escapeHtml(item.reason || "No reason provided")}</td>
+
+
+
+                    <td class="action-cell">
+
+                        <select
+
+                            aria-label="Warden action for escalation ${escapeHtml(item.escalationId)}"
+
+                            id="status-${escapeHtml(item.escalationId)}">
+
+                            <option value="OPEN" ${safeStatus === "OPEN" ? "selected" : ""}>
+
+                                Open
+
+                            </option>
+
+                            <option value="ACKNOWLEDGED" ${safeStatus === "ACKNOWLEDGED" ? "selected" : ""}>
+
+                                Acknowledged
+
+                            </option>
+
+                            <option value="HANDLED" ${safeStatus === "HANDLED" ? "selected" : ""}>
+
+                                Handled
+
+                            </option>
+
+                        </select>
+
+
+
+                        <button
+
+                            type="button"
+
+                            data-save-id="${escapeHtml(item.escalationId)}">
+
+                            Save
+
+                        </button>
+
+                            <button
+                                type="button"
+                                data-reassign-complaint-id="${escapeHtml(item.complaintId)}"
+                                data-reassign-escalation-id="${escapeHtml(item.escalationId)}"
+                                class="reassign-button">
+                                Reassign Work
+                            </button>
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("");
+
+
+
+        message.textContent =
+
+            "Showing " + filtered.length + " of " +
+
+            allEscalations.length + " escalation record(s).";
+
+    }
+
+
+
+    async function loadEscalations() {
+
+        if (loading) {
+
+            escalationsRefreshQueued = true;
+
+            return;
+
+        }
+
+
+
+        loading = true;
+
+        document.getElementById("refreshButton").disabled = true;
+
+
+
+        try {
+
+            const response = await fetch(API_URL, {
+
+                headers: {
+
+                    "Accept": "application/json"
+
+                },
+
+                cache: "no-store"
+
+            });
+
+
+
+            if (!response.ok) {
+
+                if (response.status === 401 || response.status === 403) {
+
+                    throw new Error("Access denied. Check your Spring Security configuration.");
+
+                }
+
+
+
+                throw new Error("Server returned HTTP " + response.status);
+
+            }
+
+
+
+            const data = await response.json();
+
+
+
+            if (!Array.isArray(data)) {
+
+                throw new Error("Unexpected response: expected a list of escalations.");
+
+            }
+
+
+
+            allEscalations = data;
+
+            renderEscalations();
+
+
+
+        } catch (error) {
+
+            message.textContent = "Unable to load escalations: " + error.message;
+
+
+
+            if (allEscalations.length === 0) {
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td colspan="9" class="empty">
+
+                            Unable to load escalation records. Check that the backend is running.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+        } finally {
+
+            loading = false;
+
+            document.getElementById("refreshButton").disabled = false;
+
+            if (escalationsRefreshQueued) {
+
+                escalationsRefreshQueued = false;
+
+                queueMicrotask(loadEscalations);
+
+            }
+
+        }
+
+    }
+
+
+
+    async function saveEscalationStatus(escalationId) {
+
+        const select = document.getElementById("status-" + escalationId);
+
+
+
+        if (!select) {
+
+            return;
+
+        }
+
+
+
+        const newStatus = select.value;
+
+        const saveButton = table.querySelector(
+
+            'button[data-save-id="' + CSS.escape(String(escalationId)) + '"]'
+
+        );
+
+
+
+        if (saveButton) {
+
+            saveButton.disabled = true;
+
+            saveButton.textContent = "Saving...";
+
+        }
+
+
+
+        try {
+
+            const url = API_URL + "/" + encodeURIComponent(escalationId)
+
+                + "/status?status=" + encodeURIComponent(newStatus);
+
+
+
+            const response = await fetch(url, {
+
+                method: "PATCH",
+
+                headers: {
+
+                    "Accept": "application/json"
+
+                }
+
+            });
+
+
+
+            if (!response.ok) {
+
+                const details = await response.text();
+
+                throw new Error(
+
+                    "HTTP " + response.status +
+
+                    (details ? ": " + details : "")
+
+                );
+
+            }
+
+
+
+            const updated = await response.json();
+
+
+
+            const index = allEscalations.findIndex(function (item) {
+
+                return String(item.escalationId) === String(escalationId);
+
+            });
+
+
+
+            if (index !== -1) {
+
+                allEscalations[index] = {
+
+                    ...allEscalations[index],
+
+                    ...updated
+
+                };
+
+            }
+
+
+
+            renderEscalations();
+
+            message.textContent =
+
+                "Escalation #" + escalationId + " updated to " + newStatus + ".";
+
+
+
+        } catch (error) {
+
+            message.textContent =
+
+                "Could not update escalation #" + escalationId + ": " + error.message;
+
+
+
+        } finally {
+
+            const currentButton = table.querySelector(
+
+                'button[data-save-id="' + CSS.escape(String(escalationId)) + '"]'
+
+            );
+
+
+
+            if (currentButton) {
+
+                currentButton.disabled = false;
+
+                currentButton.textContent = "Save";
+
+            }
+
+        }
+
+    }
+
+
+
+
+
+    async function reassignComplaint(complaintId, escalationId, button) {
+        const confirmed = window.confirm(
+            "Reassign complaint #" + complaintId +
+            " to an eligible staff member? The previous assignment will be preserved in history."
+        );
+
+        if (!confirmed) return;
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Reassigning...";
+        }
+
+        try {
+            const assignmentUrl = "/api/assignments/complaint/" +
+                encodeURIComponent(complaintId) + "/reassign";
+
+            const assignmentResponse = await fetch(assignmentUrl, {
+                method: "POST",
+                headers: { "Accept": "application/json" }
+            });
+
+            if (!assignmentResponse.ok) {
+                const details = await assignmentResponse.text();
+                throw new Error(
+                    "Reassignment failed (HTTP " + assignmentResponse.status + ")" +
+                    (details ? ": " + details : "")
+                );
+            }
+
+            const assignment = await assignmentResponse.json();
+            const assignedStaffName = assignment.staff && assignment.staff.staffName
+                ? assignment.staff.staffName
+                : "the selected staff member";
+
+            // A successful reassignment counts as corrective action by the warden.
+            // Mark the escalation HANDLED; the complaint remains unresolved.
+            let escalationMarkedHandled = false;
+            let statusUpdateError = "";
+
+            try {
+                const statusUrl = API_URL + "/" + encodeURIComponent(escalationId) +
+                    "/status?status=HANDLED";
+
+                const statusResponse = await fetch(statusUrl, {
+                    method: "PATCH",
+                    headers: { "Accept": "application/json" }
+                });
+
+                if (!statusResponse.ok) {
+                    const details = await statusResponse.text();
+                    throw new Error(
+                        "HTTP " + statusResponse.status +
+                        (details ? ": " + details : "")
+                    );
+                }
+
+                escalationMarkedHandled = true;
+            } catch (statusError) {
+                statusUpdateError = statusError.message || "Unknown error";
+            }
+
+            showNotification(
+                "Work reassigned",
+                "Complaint #" + complaintId + " has been assigned to " + assignedStaffName + ". " +
+                (escalationMarkedHandled
+                    ? "Escalation #" + escalationId + " marked HANDLED. The complaint still needs to be resolved and verified."
+                    : "Reassignment succeeded, but escalation status could not be updated. Update it manually. " + statusUpdateError)
+            );
+
+            message.textContent = escalationMarkedHandled
+                ? "Complaint #" + complaintId + " reassigned to " + assignedStaffName +
+                    "; escalation #" + escalationId + " marked HANDLED."
+                : "Complaint #" + complaintId + " reassigned to " + assignedStaffName +
+                    ", but escalation status update failed: " + statusUpdateError;
+
+            await Promise.all([loadComplaints(), loadEscalations()]);
+
+        } catch (error) {
+            message.textContent = "Could not reassign complaint #" + complaintId + ": " + error.message;
+            showNotification("Reassignment failed", error.message || "The complaint could not be reassigned.");
+        } finally {
+            if (button && button.isConnected) {
+                button.disabled = false;
+                button.textContent = "Reassign Work";
+            }
+        }
+    }
+
+
+    function connectWebSocket() {
+
+        if (!window.StompJs || !window.StompJs.Client) {
+
+            setConnectionStatus(false, "Live updates unavailable; automatic refresh enabled.");
+
+            return;
+
+        }
+
+
+
+        stompClient = new window.StompJs.Client({
+
+            brokerURL: "ws://" + window.location.host + "/ws",
+
+            reconnectDelay: 5000,
+
+            heartbeatIncoming: 10000,
+
+            heartbeatOutgoing: 10000,
+
+
+
+            onConnect: function () {
+
+                setConnectionStatus(true, "Live updates connected");
+
+
+
+                stompClient.subscribe(TOPIC_URL, function (frame) {
+                    try {
+                        const event = JSON.parse(frame.body);
+                        handleLiveEvent(event);
+                    } catch (error) {
+                        console.error("Could not process live event:", error);
+                    }
+
+                    // Keep dashboard tables synchronized with authoritative REST data.
+                    loadComplaints();
+                    loadEscalations();
+                });
+
+            },
+
+
+
+            onWebSocketClose: function () {
+
+                setConnectionStatus(false, "Reconnecting to live updates...");
+
+            },
+
+
+
+            onStompError: function () {
+
+                setConnectionStatus(false, "Live updates unavailable; automatic refresh enabled.");
+
+            },
+
+
+
+            onWebSocketError: function () {
+
+                setConnectionStatus(false, "Live updates unavailable; automatic refresh enabled.");
+
+            }
+
+        });
+
+
+
+        try {
+
+            stompClient.activate();
+
+        } catch (error) {
+
+            setConnectionStatus(false, "Live updates unavailable; automatic refresh enabled.");
+
+        }
+
+    }
+
+
+
+    document.querySelectorAll(".view-tab").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            switchView(button.dataset.view);
+
+        });
+
+    });
+
+
+
+    document.getElementById("refreshComplaintsButton").addEventListener("click", loadComplaints);
+    document.getElementById("refreshWardenNotificationsButton").addEventListener("click", loadWardenNotifications);
+
+    document.getElementById("refreshButton").addEventListener("click", loadEscalations);
+
+
+
+    searchInput.addEventListener("input", renderEscalations);
+
+    statusFilter.addEventListener("change", renderEscalations);
+
+    severityFilter.addEventListener("change", renderEscalations);
+
+
+
+    document.getElementById("clearFiltersButton").addEventListener("click", function () {
+
+        searchInput.value = "";
+
+        statusFilter.value = "ALL";
+
+        severityFilter.value = "ALL";
+
+        renderEscalations();
+
+    });
+
+
+
+    table.addEventListener("click", function (event) {
+        const saveButton = event.target.closest("button[data-save-id]");
+        if (saveButton) {
+            saveEscalationStatus(saveButton.dataset.saveId);
+            return;
+        }
+
+        const reassignButton = event.target.closest("button[data-reassign-complaint-id]");
+        if (reassignButton) {
+            reassignComplaint(
+                reassignButton.dataset.reassignComplaintId,
+                reassignButton.dataset.reassignEscalationId,
+                reassignButton
+            );
+        }
+    });
+
+
+
+    switchView("recent");
+
+    loadComplaints();
+
+    loadEscalations();
+
+    loadWardenNotifications();
+
+    connectWebSocket();
+
+
+
+    // Fallback refresh in case a live notification is missed. The 10-second interval
+
+    // is for dashboard freshness only; SLA breach detection remains backend-controlled.
+
+    setInterval(function () {
+
+        loadComplaints();
+
+        loadEscalations();
+
+        loadWardenNotifications();
+
+    }, 10000);
+
+</script>
+
+</body>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-brand-icon" aria-hidden="true">⌂</div>
+            <div>
+                <h3>Smart Hostel Complaint System</h3>
+                <p>Management · Maintenance · Resolution</p>
+            </div>
+        </div>
+
+        <div class="footer-developer">
+            <span class="footer-label">Designed &amp; developed by</span>
+            <strong>Rithish K</strong>
+        </div>
+
+        <nav class="footer-links" aria-label="Developer contact links">
+            <a href="https://github.com/rithishk2506"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="GitHub profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.13c-3.1.67-3.76-1.32-3.76-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.93.1-.72.39-1.21.7-1.49-2.47-.28-5.06-1.24-5.06-5.5 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.27-2.6 5.22-5.08 5.49.4.35.75 1.02.75 2.06v3.11c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/>
+                </svg>
+                <span>GitHub</span>
+            </a>
+
+            <a href="https://www.linkedin.com/in/rithish-k-551248319/"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="LinkedIn profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.9H4.98V9.4h2.95v9.5ZM6.45 8.1a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42ZM19 18.9h-2.95v-4.62c0-1.1-.02-2.51-1.53-2.51-1.53 0-1.77 1.19-1.77 2.43v4.7H9.8V9.4h2.83v1.3h.04c.39-.74 1.36-1.53 2.8-1.53 3 0 3.53 1.98 3.53 4.55v5.18Z"/>
+                </svg>
+                <span>LinkedIn</span>
+            </a>
+
+            <a href="mailto:rithishk2k7@gmail.com"
+               aria-label="Email Rithish K">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm9 8L3 7v10h18V7l-9 6Zm0-2.4L19.5 7h-15L12 10.6Z"/>
+                </svg>
+                <span>Email</span>
+            </a>
+        </nav>
+
+        <div class="footer-bottom">
+            <span>© 2026 Rithish K. All rights reserved.</span>
+            <span>Smart Hostel Complaint Management System</span>
+        </div>
+    </div>
+</footer>
+
+
+</html>

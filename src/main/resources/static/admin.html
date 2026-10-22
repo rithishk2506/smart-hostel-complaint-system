@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin - Hostel Complaint System</title>
+    <style>
+        body {
+            margin: 0; padding: 24px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9; color: #172033;
+        }
+        main { max-width: 850px; margin: auto; }
+        header, .card {
+            background: white; padding: 22px; margin-bottom: 18px;
+            border-radius: 12px; box-shadow: 0 3px 18px #0f172a0b;
+        }
+        header { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        h1 { margin: 0 0 8px; }
+        h2 { font-size: 20px; margin-top: 0; }
+        label { display: block; margin: 12px 0 6px; font-weight: bold; }
+        input {
+            width: 100%; box-sizing: border-box; padding: 11px;
+            border: 1px solid #cbd5e1; border-radius: 7px;
+        }
+        button {
+            margin-top: 16px; padding: 11px 16px; border: 0;
+            border-radius: 7px; cursor: pointer; font-weight: bold;
+            background: #1d4ed8; color: white;
+        }
+        button.logout { background: #475569; margin-top: 0; }
+        .hint { color: #64748b; font-size: 14px; }
+        .message { margin-top: 12px; overflow-wrap: anywhere; }
+        .success { color: #166534; }
+        .error { color: #b91c1c; }
+    </style>
+    <script src="/js/csrf.js"></script>
+    <link rel="stylesheet" href="/css/professional-ui.css?v=2">
+    <script src="/js/portal-shell.js" defer></script>
+    <link rel="stylesheet" href="/css/footer.css">
+    
+</head>
+<body>
+<main>
+    <header>
+        <div>
+            <h1>Admin Dashboard</h1>
+            <div id="welcome" class="hint">Checking access...</div>
+        </div>
+        <button class="logout" id="logoutButton">Log out</button>
+    </header>
+
+    <section class="card">
+        <h2>Create Warden Account</h2>
+        <p class="hint">Create a login for a warden. Use a temporary password and share it securely.</p>
+        <form id="wardenForm">
+            <label for="wardenName">Full name</label>
+            <input id="wardenName" required maxlength="120">
+
+            <label for="wardenUsername">Username</label>
+            <input id="wardenUsername" required minlength="3" maxlength="80"
+                   pattern="[a-zA-Z0-9._-]+">
+
+            <label for="wardenPassword">Temporary password</label>
+            <input id="wardenPassword" type="password" required minlength="8"
+                   autocomplete="new-password">
+
+            <button type="submit">Create Warden</button>
+            <div id="wardenMessage" class="message" role="status"></div>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Link a Staff Login</h2>
+        <p class="hint">
+            Enter a staff ID that already exists in the Staff Profiles table.
+            This creates the login account; it does not create the staff profile.
+        </p>
+        <form id="staffForm">
+            <label for="staffName">Staff full name</label>
+            <input id="staffName" required maxlength="120">
+
+            <label for="staffId">Existing Staff ID</label>
+            <input id="staffId" type="number" required min="1" step="1">
+
+            <label for="staffUsername">Username</label>
+            <input id="staffUsername" required minlength="3" maxlength="80"
+                   pattern="[a-zA-Z0-9._-]+">
+
+            <label for="staffPassword">Temporary password</label>
+            <input id="staffPassword" type="password" required minlength="8"
+                   autocomplete="new-password">
+
+            <button type="submit">Create Staff Login</button>
+            <div id="staffMessage" class="message" role="status"></div>
+        </form>
+    </section>
+</main>
+
+<script>
+    async function readResponse(response) {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.detail || data.message ||
+                "Request failed (HTTP " + response.status + ")");
+        }
+        return data;
+    }
+
+    function displayMessage(elementId, text, success) {
+        const el = document.getElementById(elementId);
+        el.textContent = text;
+        el.className = "message " + (success ? "success" : "error");
+    }
+
+    async function checkAdmin() {
+        try {
+            const response = await fetch("/api/auth/me", {
+                credentials: "same-origin"
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                location.replace("/login.html");
+                return;
+            }
+
+            const user = await readResponse(response);
+
+            if (user.role !== "ADMIN") {
+                alert("Admin access is required.");
+                location.replace("/login.html");
+                return;
+            }
+
+            document.getElementById("welcome").textContent =
+                "Signed in as " + user.fullName + " (" + user.username + ")";
+        } catch (error) {
+            document.getElementById("welcome").textContent =
+                "Unable to verify admin session. Please log in again.";
+        }
+    }
+
+    document.getElementById("wardenForm").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("/api/admin/wardens", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullName: document.getElementById("wardenName").value.trim(),
+                    username: document.getElementById("wardenUsername").value.trim(),
+                    password: document.getElementById("wardenPassword").value
+                })
+            });
+
+            const user = await readResponse(response);
+            displayMessage("wardenMessage",
+                "Created " + user.username + " with role " + user.role +
+                " (user ID " + user.userId + ").", true);
+            e.target.reset();
+        } catch (error) {
+            displayMessage("wardenMessage", error.message, false);
+        }
+    });
+
+    document.getElementById("staffForm").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("/api/admin/staff", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullName: document.getElementById("staffName").value.trim(),
+                    staffId: Number(document.getElementById("staffId").value),
+                    username: document.getElementById("staffUsername").value.trim(),
+                    password: document.getElementById("staffPassword").value
+                })
+            });
+
+            const user = await readResponse(response);
+            displayMessage("staffMessage",
+                "Created " + user.username + " with role " + user.role +
+                " (user ID " + user.userId + ").", true);
+            e.target.reset();
+        } catch (error) {
+            displayMessage("staffMessage", error.message, false);
+        }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+        try {
+            await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "same-origin"
+            });
+        } finally {
+            location.replace("/login.html");
+        }
+    });
+
+    checkAdmin();
+</script>
+</body>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-brand-icon" aria-hidden="true">⌂</div>
+            <div>
+                <h3>Smart Hostel Complaint System</h3>
+                <p>Management · Maintenance · Resolution</p>
+            </div>
+        </div>
+
+        <div class="footer-developer">
+            <span class="footer-label">Designed &amp; developed by</span>
+            <strong>Rithish K</strong>
+        </div>
+
+        <nav class="footer-links" aria-label="Developer contact links">
+            <a href="https://github.com/rithishk2506"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="GitHub profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.13c-3.1.67-3.76-1.32-3.76-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.93.1-.72.39-1.21.7-1.49-2.47-.28-5.06-1.24-5.06-5.5 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.27-2.6 5.22-5.08 5.49.4.35.75 1.02.75 2.06v3.11c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/>
+                </svg>
+                <span>GitHub</span>
+            </a>
+
+            <a href="https://www.linkedin.com/in/rithish-k-551248319/"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="LinkedIn profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.9H4.98V9.4h2.95v9.5ZM6.45 8.1a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42ZM19 18.9h-2.95v-4.62c0-1.1-.02-2.51-1.53-2.51-1.53 0-1.77 1.19-1.77 2.43v4.7H9.8V9.4h2.83v1.3h.04c.39-.74 1.36-1.53 2.8-1.53 3 0 3.53 1.98 3.53 4.55v5.18Z"/>
+                </svg>
+                <span>LinkedIn</span>
+            </a>
+
+            <a href="mailto:rithishk2k7@gmail.com"
+               aria-label="Email Rithish K">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm9 8L3 7v10h18V7l-9 6Zm0-2.4L19.5 7h-15L12 10.6Z"/>
+                </svg>
+                <span>Email</span>
+            </a>
+        </nav>
+
+        <div class="footer-bottom">
+            <span>© 2026 Rithish K. All rights reserved.</span>
+            <span>Smart Hostel Complaint Management System</span>
+        </div>
+    </div>
+</footer>
+
+</html>

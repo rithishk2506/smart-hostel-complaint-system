@@ -1,0 +1,151 @@
+
+/* Smart Hostel Complaint System — Shared Footer */
+
+.site-footer {
+    width: 100%;
+    margin-top: 40px;
+    padding: 30px 24px 18px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-top: 1px solid #dce5ef;
+    color: #193b60;
+    font-family: inherit;
+}
+
+.footer-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr 0.8fr 1fr;
+    align-items: center;
+    gap: 24px;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-brand-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #173f6b;
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.footer-brand h3 {
+    margin: 0 0 5px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.footer-brand p {
+    margin: 0;
+    color: #718096;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.footer-developer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.footer-label {
+    color: #718096;
+    font-size: 12px;
+}
+
+.footer-developer strong {
+    color: #173f6b;
+    font-size: 15px;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.footer-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #52657b;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+    color: #1769aa;
+    text-decoration: underline;
+}
+
+.footer-links a:focus-visible {
+    outline: 2px solid #1769aa;
+    outline-offset: 4px;
+    border-radius: 2px;
+}
+
+.footer-links svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+.footer-bottom {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 17px;
+    margin-top: 4px;
+    border-top: 1px solid #edf1f6;
+    color: #8190a3;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+    .site-footer {
+        padding: 24px 18px 16px;
+    }
+
+    .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .footer-links {
+        justify-content: flex-start;
+        gap: 18px;
+    }
+
+    .footer-bottom {
+        grid-column: auto;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-links a {
+        transition: none;
+    }
+}

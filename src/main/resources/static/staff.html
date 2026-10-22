@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+       <meta charset="UTF-8">
+
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+       <title>Maintenance Staff Dashboard</title>
+
+
+
+       <style>
+
+           * { box-sizing: border-box; }
+
+
+
+           body {
+
+               margin: 0;
+
+               font-family: Arial, sans-serif;
+
+               background: #f1f5f9;
+
+               color: #1e293b;
+
+           }
+
+
+
+           header {
+
+               background: #153e66;
+
+               color: white;
+
+               padding: 25px 5%;
+
+           }
+
+
+
+           header h1 { margin: 0 0 8px; }
+
+           header p { margin: 0; color: #dbeafe; }
+
+
+
+           main {
+
+               max-width: 1250px;
+
+               margin: 25px auto;
+
+               padding: 0 20px;
+
+           }
+
+
+
+           .panel, .summary, .card {
+
+               background: white;
+
+               border-radius: 12px;
+
+               padding: 20px;
+
+               box-shadow: 0 3px 12px rgba(15, 23, 42, .06);
+
+           }
+
+
+
+           .toolbar {
+
+               display: flex;
+
+               justify-content: space-between;
+
+               align-items: end;
+
+               flex-wrap: wrap;
+
+               gap: 15px;
+
+           }
+
+
+
+           label {
+
+               display: block;
+
+               font-weight: bold;
+
+               margin-bottom: 8px;
+
+           }
+
+
+
+           select, input {
+
+               padding: 11px;
+
+               border: 1px solid #cbd5e1;
+
+               border-radius: 7px;
+
+               background: white;
+
+               font-size: 14px;
+
+           }
+
+
+
+           #staffSelect { min-width: 250px; }
+
+
+
+           .summary-grid {
+
+               display: grid;
+
+               grid-template-columns: repeat(4, minmax(0, 1fr));
+
+               gap: 15px;
+
+               margin: 20px 0;
+
+           }
+
+
+
+           .summary h3 {
+
+               color: #64748b;
+
+               font-size: 14px;
+
+               font-weight: normal;
+
+               margin: 0 0 12px;
+
+           }
+
+
+
+           .summary strong {
+
+               font-size: 28px;
+
+               color: #153e66;
+
+           }
+
+
+
+           .tabs {
+
+               display: flex;
+
+               gap: 10px;
+
+               flex-wrap: wrap;
+
+               margin: 25px 0 18px;
+
+           }
+
+
+
+           button {
+
+               border: 0;
+
+               padding: 11px 15px;
+
+               border-radius: 7px;
+
+               cursor: pointer;
+
+               font-weight: bold;
+
+           }
+
+
+
+           button:disabled {
+
+               opacity: .55;
+
+               cursor: not-allowed;
+
+           }
+
+
+
+           .tab {
+
+               background: #e2e8f0;
+
+               color: #153e66;
+
+           }
+
+
+
+           .tab.active {
+
+               background: #153e66;
+
+               color: white;
+
+           }
+
+
+
+           .refresh { background: #e2e8f0; }
+
+           .start { background: #2563eb; color: white; }
+
+           .complete { background: #15803d; color: white; }
+
+
+
+           .filter-row {
+
+               display: flex;
+
+               gap: 12px;
+
+               flex-wrap: wrap;
+
+               margin-bottom: 18px;
+
+           }
+
+
+
+           #searchInput {
+
+               flex: 1;
+
+               min-width: 220px;
+
+           }
+
+
+
+           #assignmentList {
+
+               display: grid;
+
+               grid-template-columns: repeat(2, minmax(0, 1fr));
+
+               gap: 18px;
+
+           }
+
+
+
+           .card h3 {
+
+               margin: 0 0 12px;
+
+               color: #153e66;
+
+           }
+
+
+
+           .card p { line-height: 1.5; overflow-wrap: anywhere; }
+
+
+
+           .meta { color: #475569; font-size: 14px; }
+
+
+
+           .badge {
+
+               display: inline-block;
+
+               padding: 6px 10px;
+
+               border-radius: 20px;
+
+               background: #e2e8f0;
+
+               font-size: 12px;
+
+               font-weight: bold;
+
+           }
+
+
+
+           .ASSIGNED { background: #dbeafe; color: #1d4ed8; }
+
+           .IN_PROGRESS { background: #fef3c7; color: #92400e; }
+
+           .COMPLETED { background: #dcfce7; color: #166534; }
+       .REASSIGNED { background: #e2e8f0; color: #475569; }
+
+
+
+           .connection-line {
+               display: flex;
+               align-items: center;
+               gap: 8px;
+               margin: 12px 0;
+               color: #475569;
+               font-size: 13px;
+           }
+
+           .connection-dot {
+               width: 9px;
+               height: 9px;
+               border-radius: 50%;
+               background: #94a3b8;
+               display: inline-block;
+           }
+
+           .connection-line.connected .connection-dot { background: #16a34a; }
+           .connection-line.disconnected .connection-dot { background: #dc2626; }
+
+           .notification-stack {
+               position: fixed;
+               top: 18px;
+               right: 18px;
+               z-index: 9999;
+               width: min(420px, calc(100vw - 36px));
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+               pointer-events: none;
+           }
+
+           .notification-toast {
+               display: flex;
+               align-items: flex-start;
+               gap: 12px;
+               background: #fff;
+               color: #172b4d;
+               border: 1px solid #bfdbfe;
+               border-left: 5px solid #2563eb;
+               border-radius: 9px;
+               padding: 15px 16px;
+               box-shadow: 0 8px 24px #00000020;
+               pointer-events: auto;
+               animation: staffToastIn .25s ease-out;
+           }
+
+           .notification-toast .toast-content { flex: 1; min-width: 0; }
+           .notification-toast .toast-heading {
+               color: #1d4ed8;
+               font-size: 14px;
+               font-weight: bold;
+               margin-bottom: 6px;
+           }
+           .notification-toast .toast-message {
+               font-size: 13px;
+               line-height: 1.5;
+               overflow-wrap: anywhere;
+           }
+           .notification-toast .toast-close {
+               background: transparent;
+               color: #64748b;
+               padding: 0 5px;
+               font-size: 20px;
+               line-height: 1;
+           }
+           .notification-toast .toast-close:hover { background: #dbeafe; }
+
+           @keyframes staffToastIn {
+               from { opacity: 0; transform: translateX(15px); }
+               to { opacity: 1; transform: translateX(0); }
+           }
+
+           @media (max-width: 500px) {
+               .notification-stack {
+                   top: 10px;
+                   right: 10px;
+                   width: calc(100vw - 20px);
+               }
+           }
+
+           #notice {
+
+               margin: 15px 0;
+
+               line-height: 1.5;
+
+           }
+
+
+
+           .empty {
+
+               background: white;
+
+               border-radius: 10px;
+
+               padding: 25px;
+
+               color: #64748b;
+
+               grid-column: 1 / -1;
+
+           }
+
+
+
+           footer {
+
+               text-align: center;
+
+               color: #64748b;
+
+               padding: 25px;
+
+           }
+
+
+
+           @media (max-width: 800px) {
+
+               .summary-grid { grid-template-columns: repeat(2, 1fr); }
+
+               #assignmentList { grid-template-columns: 1fr; }
+
+           }
+
+       
+
+           /* Persistent notification history loaded from the backend */
+           .persistent-panel {
+               margin: 18px 0 22px;
+           }
+
+           .persistent-panel-header {
+               display: flex;
+               align-items: flex-start;
+               justify-content: space-between;
+               flex-wrap: wrap;
+               gap: 12px;
+               margin-bottom: 12px;
+           }
+
+           .persistent-panel-header h2 {
+               margin: 0 0 6px;
+               color: #153e66;
+               font-size: 20px;
+           }
+
+           .persistent-panel-header p {
+               margin: 0;
+               color: #64748b;
+               font-size: 13px;
+           }
+
+           .saved-notification-count {
+               display: inline-block;
+               margin-left: 8px;
+               border-radius: 20px;
+               padding: 4px 8px;
+               background: #fee2e2;
+               color: #991b1b;
+               font-size: 12px;
+               vertical-align: middle;
+           }
+
+           .saved-notification-list {
+               display: grid;
+               grid-template-columns: repeat(2, minmax(0, 1fr));
+               gap: 12px;
+           }
+
+           .saved-notification-item {
+               min-width: 0;
+               border: 1px solid #e2e8f0;
+               border-left: 4px solid #94a3b8;
+               border-radius: 8px;
+               padding: 14px;
+               background: #f8fafc;
+               overflow-wrap: anywhere;
+           }
+
+           .saved-notification-item.unread {
+               border-left-color: #2563eb;
+               background: #eff6ff;
+           }
+
+           .saved-notification-title-row {
+               display: flex;
+               justify-content: space-between;
+               align-items: flex-start;
+               gap: 10px;
+           }
+
+           .saved-notification-title-row h3 {
+               margin: 0 0 8px;
+               font-size: 15px;
+           }
+
+           .notification-read-badge {
+               flex: 0 0 auto;
+               border-radius: 20px;
+               padding: 4px 7px;
+               background: #e2e8f0;
+               color: #475569;
+               font-size: 11px;
+               font-weight: bold;
+           }
+
+           .notification-read-badge.unread-badge {
+               background: #dbeafe;
+               color: #1d4ed8;
+           }
+
+           .saved-notification-message {
+               margin: 5px 0 10px;
+               line-height: 1.5;
+               font-size: 14px;
+           }
+
+           .saved-notification-meta {
+               margin: 5px 0;
+               color: #64748b;
+               font-size: 12px;
+           }
+
+           .mark-notification-read {
+               margin-top: 8px;
+               padding: 8px 11px;
+               background: #153e66;
+               color: #fff;
+               font-size: 12px;
+           }
+
+           .saved-notification-empty {
+               grid-column: 1 / -1;
+               padding: 18px;
+               border-radius: 8px;
+               background: #f8fafc;
+               color: #64748b;
+               font-size: 14px;
+           }
+
+           @media (max-width: 800px) {
+               .saved-notification-list { grid-template-columns: 1fr; }
+           }
+
+       </style>
+       <script src="/js/csrf.js"></script>
+       <link rel="stylesheet" href="/css/professional-ui.css?v=2">
+       <script src="/js/portal-shell.js" defer></script>
+       <link rel="stylesheet" href="/css/footer.css">
+
+</head>
+
+
+
+<body>
+
+<header>
+
+       <h1>Maintenance Staff Dashboard</h1>
+
+       <p>Smart Hostel Complaint Management and Real-Time Resolution System</p>
+
+</header>
+
+
+
+<main>
+
+       <section class="panel toolbar">
+
+           <div>
+
+               <label for="staffSelect">Staff Profile</label>
+
+               <select id="staffSelect" disabled aria-label="Your linked staff profile">
+
+                   <option value="">Loading staff...</option>
+
+               </select>
+
+           </div>
+
+           <button class="refresh" id="refreshButton">Refresh Assignments</button>
+
+       </section>
+
+
+
+       <div id="liveStatus" class="connection-line" role="status" aria-live="polite">
+           <span class="connection-dot"></span>
+           <span id="liveStatusText">Connecting to live notifications...</span>
+       </div>
+
+
+
+       <section class="panel persistent-panel" aria-labelledby="savedNotificationsHeading">
+           <div class="persistent-panel-header">
+               <div>
+                   <h2 id="savedNotificationsHeading">
+                       Saved Notifications
+                       <span id="staffUnreadCount" class="saved-notification-count">0 unread</span>
+                   </h2>
+                   <p>Notifications are saved in the database and remain available after reconnecting.</p>
+               </div>
+               <button type="button" class="refresh" id="refreshSavedNotificationsButton">
+                   Refresh Notifications
+               </button>
+           </div>
+           <p id="savedNotificationMessage" class="meta" role="status" aria-live="polite">
+               Loading saved notifications...
+           </p>
+           <div id="savedNotificationList" class="saved-notification-list">
+               <div class="saved-notification-empty">Loading saved notifications...</div>
+           </div>
+       </section>
+
+
+       <div id="notificationStack" class="notification-stack" aria-live="polite" aria-atomic="false"></div>
+
+       <div id="notice" role="status" aria-live="polite"></div>
+
+
+
+       <section class="summary-grid">
+
+           <div class="summary">
+
+               <h3>Total Assignments</h3>
+
+               <strong id="totalCount">0</strong>
+
+           </div>
+
+           <div class="summary">
+
+               <h3>Assigned</h3>
+
+               <strong id="assignedCount">0</strong>
+
+           </div>
+
+           <div class="summary">
+
+               <h3>In Progress</h3>
+
+               <strong id="progressCount">0</strong>
+
+           </div>
+
+           <div class="summary">
+
+               <h3>Completed Work</h3>
+
+               <strong id="completedCount">0</strong>
+
+           </div>
+
+       </section>
+
+
+
+       <nav class="tabs" aria-label="Assignment views">
+
+           <button class="tab active" data-view="active">Active Assignments</button>
+
+           <button class="tab" data-view="history">Assignment History</button>
+
+       </nav>
+
+
+
+       <section class="panel">
+
+           <div class="filter-row">
+
+               <input id="searchInput" type="search"
+
+                      placeholder="Search by complaint title or ID">
+
+               <select id="statusFilter" aria-label="Filter by assignment status">
+
+                   <option value="ALL">All statuses</option>
+
+                   <option value="ASSIGNED">Assigned</option>
+
+                   <option value="IN_PROGRESS">In Progress</option>
+
+                   <option value="COMPLETED">Completed</option>
+               <option value="REASSIGNED">Reassigned</option>
+
+               </select>
+
+           </div>
+
+
+
+           <h2 id="viewTitle">Active Assignments</h2>
+
+           <p class="meta" id="viewDescription">
+
+               Work that still needs to be started or completed.
+
+           </p>
+
+
+
+           <section id="assignmentList">
+
+               <div class="empty">Loading assignments...</div>
+
+           </section>
+
+       </section>
+
+</main>
+
+
+
+<footer>Smart Hostel Complaint System | Maintenance Staff Portal</footer>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
+
+<script>
+
+       const STAFF_API = "/api/staff";
+
+       const ASSIGNMENTS_API = "/api/assignments";
+       const NOTIFICATIONS_API = "/api/notifications";
+
+
+
+       const staffSelect = document.getElementById("staffSelect");
+
+       const assignmentList = document.getElementById("assignmentList");
+
+       const notice = document.getElementById("notice");
+
+       const searchInput = document.getElementById("searchInput");
+
+       const statusFilter = document.getElementById("statusFilter");
+
+
+
+       let assignments = [];
+
+       let currentView = "active";
+
+       let loading = false;
+       let stompClient = null;
+       let staffSubscription = null;
+       let subscribedStaffId = null;
+       const receivedNotificationKeys = new Set();
+       let savedNotifications = [];
+       let savedNotificationsLoading = false;
+
+
+
+       function notificationIsRead(notification) {
+           return Boolean(notification && (notification.read === true || notification.isRead === true));
+       }
+
+       function formatNotificationDate(value) {
+           if (!value) return "Date not available";
+           const date = new Date(value);
+           return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+       }
+
+       function renderSavedNotifications() {
+           const list = document.getElementById("savedNotificationList");
+           const message = document.getElementById("savedNotificationMessage");
+           const unreadCount = savedNotifications.filter(n => !notificationIsRead(n)).length;
+
+           document.getElementById("staffUnreadCount").textContent = unreadCount + " unread";
+           list.replaceChildren();
+
+           if (savedNotifications.length === 0) {
+               list.appendChild(element(
+                   "div",
+                   "saved-notification-empty",
+                   "No saved notifications yet. New assignments and reassignments will appear here."
+               ));
+               message.textContent = "No saved notifications found for this staff profile.";
+               return;
+           }
+
+           message.textContent = "Showing " + savedNotifications.length +
+               " saved notification(s), newest first.";
+
+           savedNotifications.forEach(notification => {
+               const read = notificationIsRead(notification);
+               const card = element(
+                   "article",
+                   "saved-notification-item" + (read ? "" : " unread")
+               );
+
+               const titleRow = element("div", "saved-notification-title-row");
+               titleRow.appendChild(element("h3", "", notification.title || "Notification"));
+               titleRow.appendChild(element(
+                   "span",
+                   "notification-read-badge" + (read ? "" : " unread-badge"),
+                   read ? "Read" : "Unread"
+               ));
+               card.appendChild(titleRow);
+               card.appendChild(element(
+                   "p",
+                   "saved-notification-message",
+                   notification.message || "No message provided."
+               ));
+
+               const details = [];
+               if (notification.complaintId != null) details.push("Complaint #" + notification.complaintId);
+               if (notification.assignmentId != null) details.push("Assignment #" + notification.assignmentId);
+               if (notification.eventType) details.push(String(notification.eventType).replaceAll("_", " "));
+               if (details.length) card.appendChild(element("p", "saved-notification-meta", details.join(" · ")));
+
+               card.appendChild(element(
+                   "p",
+                   "saved-notification-meta",
+                   "Received: " + formatNotificationDate(notification.createdAt)
+               ));
+
+               if (!read) {
+                   const button = element("button", "mark-notification-read", "Mark as read");
+                   button.type = "button";
+                   button.dataset.notificationId = String(notification.notificationId);
+                   button.addEventListener("click", () => markStaffNotificationRead(notification.notificationId, button));
+                   card.appendChild(button);
+               }
+
+               list.appendChild(card);
+           });
+       }
+
+       async function loadSavedNotifications() {
+           const staffId = staffSelect.value;
+           if (!staffId || savedNotificationsLoading) return;
+
+           savedNotificationsLoading = true;
+           const message = document.getElementById("savedNotificationMessage");
+
+           try {
+               const result = await getJson(
+                   NOTIFICATIONS_API + "/staff/" + encodeURIComponent(staffId)
+               );
+               savedNotifications = Array.isArray(result) ? result : [];
+               renderSavedNotifications();
+           } catch (error) {
+               message.textContent = "Could not load saved notifications: " + error.message;
+               message.style.color = "#b91c1c";
+           } finally {
+               savedNotificationsLoading = false;
+           }
+       }
+
+       async function markStaffNotificationRead(notificationId, button) {
+           if (!staffSelect.value) return;
+           button.disabled = true;
+           button.textContent = "Saving...";
+
+           try {
+               const url = NOTIFICATIONS_API + "/" + encodeURIComponent(notificationId) +
+                   "/read?recipientType=STAFF&recipientId=" + encodeURIComponent(staffSelect.value);
+               await getJson(url, { method: "PATCH" });
+               await loadSavedNotifications();
+           } catch (error) {
+               button.disabled = false;
+               button.textContent = "Mark as read";
+               document.getElementById("savedNotificationMessage").textContent =
+                   "Could not mark notification as read: " + error.message;
+               document.getElementById("savedNotificationMessage").style.color = "#b91c1c";
+           }
+       }
+
+       function statusOf(value) {
+
+           return String(value || "").trim().toUpperCase();
+
+       }
+
+
+
+       function showNotice(message, error = false) {
+
+           notice.textContent = message;
+
+           notice.style.color = error ? "#b91c1c" : "#166534";
+
+       }
+
+       function setLiveStatus(connected, text) {
+           const status = document.getElementById("liveStatus");
+           status.classList.toggle("connected", connected);
+           status.classList.toggle("disconnected", !connected);
+           document.getElementById("liveStatusText").textContent = text;
+       }
+
+       function showStaffNotification(title, message) {
+           const stack = document.getElementById("notificationStack");
+           const toast = element("div", "notification-toast");
+           toast.setAttribute("role", "status");
+
+           const content = element("div", "toast-content");
+           content.appendChild(element("div", "toast-heading", title));
+           content.appendChild(element("div", "toast-message", message));
+
+           const closeButton = element("button", "toast-close", "×");
+           closeButton.type = "button";
+           closeButton.setAttribute("aria-label", "Dismiss notification");
+           closeButton.addEventListener("click", () => toast.remove());
+
+           toast.appendChild(content);
+           toast.appendChild(closeButton);
+           stack.prepend(toast);
+
+           window.setTimeout(() => toast.remove(), 12000);
+       }
+
+       function handleStaffNotification(event) {
+           if (!event || typeof event !== "object") return;
+
+           const targetStaffId = String(event.staffId ?? "");
+           if (targetStaffId && targetStaffId !== String(staffSelect.value)) return;
+
+           const eventType = String(event.eventType || "").toUpperCase();
+           if (!["COMPLAINT_ASSIGNED", "COMPLAINT_REASSIGNED"].includes(eventType)) {
+               return;
+           }
+
+           const key = eventType + ":" + String(event.assignmentId ?? "") + ":" +
+               String(event.occurredAt ?? "");
+           if (receivedNotificationKeys.has(key)) return;
+           receivedNotificationKeys.add(key);
+
+           const heading = eventType === "COMPLAINT_REASSIGNED"
+               ? "Work reassigned to you"
+               : "New work assigned";
+           const message = event.message ||
+               "Complaint #" + String(event.complaintId ?? "") + " has been assigned to you.";
+
+           showStaffNotification(heading, message);
+           showNotice(message);
+
+           // Refresh the staff member's assignments so the new task appears immediately.
+           loadAssignments();
+           loadSavedNotifications();
+       }
+
+       function subscribeToSelectedStaff() {
+           if (!stompClient || !stompClient.connected || !staffSelect.value) return;
+
+           const staffId = String(staffSelect.value);
+           if (staffSubscription && subscribedStaffId === staffId) return;
+
+           if (staffSubscription) {
+               staffSubscription.unsubscribe();
+               staffSubscription = null;
+           }
+
+           subscribedStaffId = staffId;
+           staffSubscription = stompClient.subscribe(
+               "/topic/staff/" + staffId,
+               frame => {
+                   try {
+                       handleStaffNotification(JSON.parse(frame.body));
+                   } catch (error) {
+                       console.error("Could not parse staff notification:", error);
+                   }
+               }
+           );
+
+           setLiveStatus(true, "Live notifications connected for staff ID " + staffId);
+       }
+
+       function connectStaffNotifications() {
+           if (!window.StompJs || !window.StompJs.Client) {
+               setLiveStatus(false, "Live notifications unavailable; periodic refresh remains enabled.");
+               return;
+           }
+
+           const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
+           stompClient = new window.StompJs.Client({
+               brokerURL: wsProtocol + window.location.host + "/ws",
+               reconnectDelay: 5000,
+               heartbeatIncoming: 10000,
+               heartbeatOutgoing: 10000,
+
+               onConnect: function () {
+                   subscribeToSelectedStaff();
+               },
+
+               onWebSocketClose: function () {
+                   setLiveStatus(false, "Disconnected from live notifications; reconnecting...");
+               },
+
+               onStompError: function (frame) {
+                   console.error("Staff notification broker error:", frame && frame.headers
+                       ? frame.headers.message
+                       : "Unknown STOMP error");
+                   setLiveStatus(false, "Live notifications unavailable; reconnecting...");
+               },
+
+               onWebSocketError: function () {
+                   setLiveStatus(false, "Live notifications unavailable; reconnecting...");
+               }
+           });
+
+           try {
+               stompClient.activate();
+           } catch (error) {
+               console.error("Could not start staff notifications:", error);
+               setLiveStatus(false, "Could not connect to live notifications.");
+           }
+       }
+       async function getJson(url, options = {}) {
+           const response = await fetch(url, {
+               cache: "no-store",
+               credentials: "same-origin",
+               ...options
+           });
+
+           if (!response.ok) {
+               const raw = await response.text();
+               let message = raw || ("HTTP " + response.status);
+               try {
+                   const payload = JSON.parse(raw);
+                   message = payload.message || payload.detail || message;
+               } catch (_) {
+                   // Keep the raw response when it is not JSON.
+               }
+               const error = new Error(message);
+               error.status = response.status;
+               throw error;
+           }
+
+           if (response.status === 204) return null;
+           return response.json();
+       }
+
+       function element(tag, className, text) {
+
+           const node = document.createElement(tag);
+
+           if (className) node.className = className;
+
+           if (text !== undefined) node.textContent = text;
+
+           return node;
+
+       }
+
+
+
+       function addOption(select, value, label) {
+
+           const option = document.createElement("option");
+
+           option.value = String(value);
+
+           option.textContent = label;
+
+           select.appendChild(option);
+
+       }
+       async function loadStaff() {
+           staffSelect.disabled = true;
+           try {
+               // Identity comes from the authenticated server session, never a user-selected ID.
+               const user = await getJson("/api/auth/me");
+
+               if (user.role !== "STAFF") {
+                   window.location.replace("/login.html");
+                   return;
+               }
+
+               if (user.staffId == null) {
+                   throw new Error("This login is not linked to a staff profile. Ask the administrator to link it.");
+               }
+
+               // Staff are allowed to read only their own profile endpoint.
+               const person = await getJson(
+                   STAFF_API + "/" + encodeURIComponent(user.staffId)
+               );
+
+               staffSelect.replaceChildren();
+               addOption(
+                   staffSelect,
+                   person.staffId,
+                   person.staffName + " (ID: " + person.staffId + ")"
+               );
+               staffSelect.value = String(person.staffId);
+               staffSelect.disabled = true;
+
+               await loadAssignments();
+               await loadSavedNotifications();
+               connectStaffNotifications();
+           } catch (error) {
+               if (error.status === 401) {
+                   window.location.replace("/login.html");
+                   return;
+               }
+
+               if (error.status === 403) {
+                   staffSelect.replaceChildren();
+                   addOption(staffSelect, "", "Access denied");
+                   showNotice("Access denied: this login cannot access the requested staff profile.", true);
+                   setLiveStatus(false, "Access denied.");
+                   renderEmpty("Your account is not authorized to access this staff profile. Please contact the administrator.");
+                   return;
+               }
+
+               staffSelect.replaceChildren();
+               addOption(staffSelect, "", "Staff profile unavailable");
+               staffSelect.disabled = true;
+               showNotice("Could not load your staff profile: " + error.message, true);
+               setLiveStatus(false, "Live notifications unavailable until your staff profile loads.");
+               renderEmpty("Could not load the staff profile. Check that your account is linked to an existing staff profile.");
+           }
+       }
+
+       async function loadAssignments() {
+
+           if (!staffSelect.value || loading) return;
+
+
+
+           loading = true;
+
+           try {
+
+               const result = await getJson(
+
+                   ASSIGNMENTS_API + "/staff/" +
+
+                   encodeURIComponent(staffSelect.value)
+
+               );
+
+
+
+               assignments = Array.isArray(result) ? result : [];
+
+               updateSummary();
+
+               renderAssignments();
+
+               showNotice("Assignments loaded successfully.");
+
+           } catch (error) {
+
+               showNotice("Could not load assignments: " + error.message, true);
+
+               renderEmpty("Unable to load assignments.");
+
+           } finally {
+
+               loading = false;
+
+           }
+
+       }
+
+
+
+       function updateSummary() {
+
+           document.getElementById("totalCount").textContent = assignments.length;
+
+           document.getElementById("assignedCount").textContent =
+
+               assignments.filter(a => statusOf(a.status) === "ASSIGNED").length;
+
+           document.getElementById("progressCount").textContent =
+
+               assignments.filter(a => statusOf(a.status) === "IN_PROGRESS").length;
+
+           document.getElementById("completedCount").textContent =
+
+               assignments.filter(a => statusOf(a.status) === "COMPLETED").length;
+
+       }
+
+
+
+       function renderEmpty(message) {
+
+           assignmentList.replaceChildren(element("div", "empty", message));
+
+       }
+
+
+
+       function renderAssignments() {
+
+           assignmentList.replaceChildren();
+
+
+
+           const query = searchInput.value.trim().toLowerCase();
+
+           const requestedStatus = statusFilter.value;
+
+
+
+           const filtered = assignments.filter(assignment => {
+
+               const status = statusOf(assignment.status);
+
+               const complaint = assignment.complaint || {};
+
+
+
+               const isCompleted = status === "COMPLETED";
+            const isHistorical = ["COMPLETED", "REASSIGNED"].includes(status);
+            const belongsToView = currentView === "history"
+                ? isHistorical
+                : !isHistorical;
+
+
+
+               const matchesStatus =
+
+                   requestedStatus === "ALL" || requestedStatus === status;
+
+
+
+               const matchesSearch =
+
+                   String(complaint.title || "").toLowerCase().includes(query) ||
+
+                   String(complaint.complaintId || "").includes(query) ||
+
+                   String(assignment.assignmentId || "").includes(query);
+
+
+
+               return belongsToView && matchesStatus && matchesSearch;
+
+           });
+
+
+
+           document.getElementById("viewTitle").textContent =
+
+               currentView === "history"
+
+                   ? "Assignment History"
+
+                   : "Active Assignments";
+
+
+
+           document.getElementById("viewDescription").textContent =
+
+               currentView === "history"
+
+                   ? "Completed and reassigned tasks are retained here for reference."
+
+                   : "Assignments that still require work.";
+
+
+
+           if (filtered.length === 0) {
+
+               renderEmpty(currentView === "history"
+
+                   ? "No completed or reassigned tasks match these filters."
+
+                   : "No active assignments match these filters.");
+
+               return;
+
+           }
+
+
+
+           filtered.forEach(assignment => {
+
+               const complaint = assignment.complaint || {};
+
+               const staff = assignment.staff || {};
+
+               const status = statusOf(assignment.status);
+
+               const card = element("article", "card");
+
+
+
+               card.appendChild(element(
+
+                   "h3",
+
+                   "",
+
+                   complaint.title || "Complaint #" + (complaint.complaintId ?? "N/A")
+
+               ));
+
+
+
+               card.appendChild(element(
+
+                   "p",
+
+                   "meta",
+
+                   "Complaint ID: " + (complaint.complaintId ?? "N/A") +
+
+                   " | Assignment ID: " + (assignment.assignmentId ?? "N/A")
+
+               ));
+
+
+
+               card.appendChild(element(
+
+                   "p", "", complaint.description || "No description provided."
+
+               ));
+
+
+
+               card.appendChild(element(
+
+                   "p",
+
+                   "meta",
+
+                   "Category: " + (complaint.category || "N/A") +
+
+                   " | Severity: " + (complaint.severity || "N/A") +
+
+                   " | Priority: " + (complaint.priority || "N/A")
+
+               ));
+
+
+
+               card.appendChild(element(
+
+                   "p",
+
+                   "meta",
+
+                   "Assigned to: " + (staff.staffName || "N/A")
+
+               ));
+
+
+
+               const statusLine = element("p");
+
+               statusLine.appendChild(element("span", "badge " + status, status));
+
+               statusLine.appendChild(element(
+
+                   "span",
+
+                   "meta",
+
+                   " Complaint status: " + (complaint.status || "N/A")
+
+               ));
+
+               card.appendChild(statusLine);
+
+
+
+               if (assignment.assignedAt) {
+
+                   card.appendChild(element(
+
+                       "p",
+
+                       "meta",
+
+                       "Assigned at: " +
+
+                       new Date(assignment.assignedAt).toLocaleString()
+
+                   ));
+
+               }
+
+
+
+               if (assignment.completedAt) {
+
+                   card.appendChild(element(
+
+                       "p",
+
+                       "meta",
+
+                       "Completed at: " +
+
+                       new Date(assignment.completedAt).toLocaleString()
+
+                   ));
+
+               }
+
+
+
+               if (status === "ASSIGNED") {
+
+                   const button = element("button", "start", "Start Work");
+
+                   button.addEventListener("click", () =>
+
+                       updateAssignment(assignment.assignmentId, "start", button)
+
+                   );
+
+                   card.appendChild(button);
+
+               } else if (status === "IN_PROGRESS") {
+
+                   const button = element(
+
+                       "button", "complete", "Mark Work Completed"
+
+                   );
+
+                   button.addEventListener("click", () =>
+
+                       updateAssignment(assignment.assignmentId, "complete", button)
+
+                   );
+
+                   card.appendChild(button);
+
+               } else if (status === "COMPLETED") {
+
+                   card.appendChild(element(
+
+                       "p",
+
+                       "meta",
+
+                       "Work completed. The student can verify the resolution."
+
+                   ));
+
+               } else if (status === "REASSIGNED") {
+                card.appendChild(element(
+                    "p",
+                    "meta",
+                    "This assignment was reassigned. The history record is retained for reference."
+                ));
+            }
+
+
+
+               assignmentList.appendChild(card);
+
+           });
+
+       }
+
+
+
+       async function updateAssignment(id, action, button) {
+
+           const description = action === "start"
+
+               ? "start work on"
+
+               : "mark work completed for";
+
+
+
+           if (!confirm("Do you want to " + description + " assignment #" + id + "?")) {
+
+               return;
+
+           }
+
+
+
+           button.disabled = true;
+
+           try {
+
+               await getJson(
+
+                   ASSIGNMENTS_API + "/" + encodeURIComponent(id) + "/" + action,
+
+                   { method: "PATCH" }
+
+               );
+
+
+
+               showNotice("Assignment updated successfully.");
+
+               await loadAssignments();
+
+           } catch (error) {
+
+               showNotice("Update failed: " + error.message, true);
+
+               button.disabled = false;
+
+           }
+
+       }
+
+
+
+       document.querySelectorAll(".tab").forEach(button => {
+
+           button.addEventListener("click", () => {
+
+               currentView = button.dataset.view;
+
+
+
+               document.querySelectorAll(".tab").forEach(tab => {
+
+                   tab.classList.toggle("active", tab === button);
+
+               });
+
+
+
+               statusFilter.value = "ALL";
+
+               renderAssignments();
+
+           });
+
+       });
+
+
+
+       staffSelect.addEventListener("change", async () => {
+           await loadAssignments();
+           await loadSavedNotifications();
+           subscribeToSelectedStaff();
+       });
+
+       document.getElementById("refreshButton").addEventListener("click", loadAssignments);
+       document.getElementById("refreshSavedNotificationsButton").addEventListener("click", loadSavedNotifications);
+
+       searchInput.addEventListener("input", renderAssignments);
+
+       statusFilter.addEventListener("change", renderAssignments);
+
+
+
+       // Periodically refresh the selected staff member's assignments.
+
+       setInterval(() => {
+
+           if (!loading && staffSelect.value) loadAssignments();
+           if (staffSelect.value) loadSavedNotifications();
+
+       }, 10000);
+
+
+
+       loadStaff();
+
+</script>
+
+</body>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-brand-icon" aria-hidden="true">⌂</div>
+            <div>
+                <h3>Smart Hostel Complaint System</h3>
+                <p>Management · Maintenance · Resolution</p>
+            </div>
+        </div>
+
+        <div class="footer-developer">
+            <span class="footer-label">Designed &amp; developed by</span>
+            <strong>Rithish K</strong>
+        </div>
+
+        <nav class="footer-links" aria-label="Developer contact links">
+            <a href="https://github.com/rithishk2506"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="GitHub profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.13c-3.1.67-3.76-1.32-3.76-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.93.1-.72.39-1.21.7-1.49-2.47-.28-5.06-1.24-5.06-5.5 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.27-2.6 5.22-5.08 5.49.4.35.75 1.02.75 2.06v3.11c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/>
+                </svg>
+                <span>GitHub</span>
+            </a>
+
+            <a href="https://www.linkedin.com/in/rithish-k-551248319/"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="LinkedIn profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.9H4.98V9.4h2.95v9.5ZM6.45 8.1a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42ZM19 18.9h-2.95v-4.62c0-1.1-.02-2.51-1.53-2.51-1.53 0-1.77 1.19-1.77 2.43v4.7H9.8V9.4h2.83v1.3h.04c.39-.74 1.36-1.53 2.8-1.53 3 0 3.53 1.98 3.53 4.55v5.18Z"/>
+                </svg>
+                <span>LinkedIn</span>
+            </a>
+
+            <a href="mailto:rithishk2k7@gmail.com"
+               aria-label="Email Rithish K">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm9 8L3 7v10h18V7l-9 6Zm0-2.4L19.5 7h-15L12 10.6Z"/>
+                </svg>
+                <span>Email</span>
+            </a>
+        </nav>
+
+        <div class="footer-bottom">
+            <span>© 2026 Rithish K. All rights reserved.</span>
+            <span>Smart Hostel Complaint Management System</span>
+        </div>
+    </div>
+</footer>
+
+
+</html>

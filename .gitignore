@@ -1,0 +1,20 @@
+
+target/
+*.class
+
+# Eclipse
+.metadata/
+.settings/
+.classpath
+.project
+
+# Secrets
+.env
+.env.*
+!.env.example
+application-local.properties
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db

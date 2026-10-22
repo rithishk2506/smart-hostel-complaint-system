@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Complaint System - Login</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033;
+        }
+        .card {
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px #0f172a12;
+        }
+        h1 { margin: 0 0 8px; font-size: 25px; }
+        .subtitle { color: #64748b; margin: 0 0 24px; }
+        label {
+            display: block;
+            font-weight: 600;
+            margin: 14px 0 6px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        button {
+            width: 100%;
+            border: 0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 18px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #1d4ed8;
+            color: white;
+        }
+        button.secondary { background: #334155; }
+        button:disabled { opacity: .6; cursor: wait; }
+        .switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #475569;
+            font-size: 14px;
+        }
+        .switch a { color: #1d4ed8; cursor: pointer; }
+        #message {
+            margin-top: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+        .hidden { display: none; }
+    </style>
+    <script src="/js/csrf.js"></script>
+    <link rel="stylesheet" href="/css/professional-ui.css?v=2">
+    <script src="/js/portal-shell.js" defer></script>
+    <link rel="stylesheet" href="/css/footer.css">
+</head>
+<body>
+<div class="card">
+    <section id="loginSection">
+        <h1>Hostel Complaint System</h1>
+        <p class="subtitle">Sign in to continue to your dashboard.</p>
+
+        <form id="loginForm">
+            <label for="loginUsername">Username</label>
+            <input id="loginUsername" name="username"
+                   autocomplete="username" required>
+
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" name="password"
+                   type="password" autocomplete="current-password" required>
+
+            <button id="loginButton" type="submit">Sign In</button>
+        </form>
+
+        <p class="switch">
+            Student without an account?
+            <a id="showRegister">Register here</a>
+        </p>
+    </section>
+
+    <section id="registerSection" class="hidden">
+        <h1>Student Registration</h1>
+        <p class="subtitle">Create a student account.</p>
+
+        <form id="registerForm">
+            <label for="fullName">Full name</label>
+            <input id="fullName" autocomplete="name" required maxlength="120">
+
+            <label for="registerUsername">Username</label>
+            <input id="registerUsername" autocomplete="username"
+                   required minlength="3" maxlength="80"
+                   pattern="[a-zA-Z0-9._-]+">
+
+            <label for="registerPassword">Password</label>
+            <input id="registerPassword" type="password"
+                   autocomplete="new-password" required minlength="8">
+
+            <button type="submit">Create Student Account</button>
+            <button type="button" class="secondary" id="backToLogin">
+                Back to Login
+            </button>
+        </form>
+    </section>
+
+    <div id="message" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+    const message = document.getElementById("message");
+
+    function showMessage(text, isError = true) {
+        message.textContent = text;
+        message.style.color = isError ? "#b91c1c" : "#166534";
+    }
+
+    document.getElementById("showRegister").addEventListener("click", () => {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("registerSection").classList.remove("hidden");
+        showMessage("");
+    });
+
+    document.getElementById("backToLogin").addEventListener("click", () => {
+        document.getElementById("registerSection").classList.add("hidden");
+        document.getElementById("loginSection").classList.remove("hidden");
+        showMessage("");
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const button = document.getElementById("loginButton");
+        button.disabled = true;
+        showMessage("Signing in...", false);
+
+        try {
+            const response = await fetch("/api/auth/login", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: document.getElementById("loginUsername").value.trim(),
+                    password: document.getElementById("loginPassword").value
+                })
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(result.detail || result.message ||
+                    (response.status === 401
+                        ? "Invalid username or password."
+                        : "Login failed. HTTP " + response.status));
+            }
+
+            const dashboards = {
+                STUDENT: "/student.html",
+                STAFF: "/staff.html",
+                WARDEN: "/warden.html",
+                ADMIN: "/admin.html"
+            };
+
+            const destination = dashboards[result.role];
+
+            if (!destination) {
+                throw new Error("This account has no valid dashboard role.");
+            }
+
+            showMessage("Login successful. Opening your dashboard...", false);
+            window.location.assign(destination);
+
+        } catch (error) {
+            showMessage(error.message || "Unable to contact the server.");
+            button.disabled = false;
+        }
+    });
+
+    document.getElementById("registerForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        showMessage("Creating student account...", false);
+
+        try {
+            const response = await fetch("/api/auth/register/student", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullName: document.getElementById("fullName").value.trim(),
+                    username: document.getElementById("registerUsername").value.trim(),
+                    password: document.getElementById("registerPassword").value
+                })
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(result.detail || result.message ||
+                    "Registration failed. HTTP " + response.status);
+            }
+
+            document.getElementById("loginUsername").value = result.username;
+            document.getElementById("registerPassword").value = "";
+            document.getElementById("registerSection").classList.add("hidden");
+            document.getElementById("loginSection").classList.remove("hidden");
+
+            showMessage("Student account created. Please sign in.", false);
+
+        } catch (error) {
+            showMessage(error.message || "Unable to contact the server.");
+        }
+    });
+</script>
+</body>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-brand-icon" aria-hidden="true">⌂</div>
+            <div>
+                <h3>Smart Hostel Complaint System</h3>
+                <p>Management · Maintenance · Resolution</p>
+            </div>
+        </div>
+
+        <div class="footer-developer">
+            <span class="footer-label">Designed &amp; developed by</span>
+            <strong>Rithish K</strong>
+        </div>
+
+        <nav class="footer-links" aria-label="Developer contact links">
+            <a href="https://github.com/rithishk2506"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="GitHub profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.13c-3.1.67-3.76-1.32-3.76-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.93.1-.72.39-1.21.7-1.49-2.47-.28-5.06-1.24-5.06-5.5 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.27-2.6 5.22-5.08 5.49.4.35.75 1.02.75 2.06v3.11c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/>
+                </svg>
+                <span>GitHub</span>
+            </a>
+
+            <a href="https://www.linkedin.com/in/rithish-k-551248319/"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="LinkedIn profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.9H4.98V9.4h2.95v9.5ZM6.45 8.1a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42ZM19 18.9h-2.95v-4.62c0-1.1-.02-2.51-1.53-2.51-1.53 0-1.77 1.19-1.77 2.43v4.7H9.8V9.4h2.83v1.3h.04c.39-.74 1.36-1.53 2.8-1.53 3 0 3.53 1.98 3.53 4.55v5.18Z"/>
+                </svg>
+                <span>LinkedIn</span>
+            </a>
+
+            <a href="mailto:rithishk2k7@gmail.com"
+               aria-label="Email Rithish K">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm9 8L3 7v10h18V7l-9 6Zm0-2.4L19.5 7h-15L12 10.6Z"/>
+                </svg>
+                <span>Email</span>
+            </a>
+        </nav>
+
+        <div class="footer-bottom">
+            <span>© 2026 Rithish K. All rights reserved.</span>
+            <span>Smart Hostel Complaint Management System</span>
+        </div>
+    </div>
+</footer>
+
+</html>
